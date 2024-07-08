@@ -19,7 +19,7 @@ inputs:
   checkout:
     description: First decide whether to check or not
     required: false
-    default: true
+    default: false
   workspace-dir:
     description: ROS2 Workspace directory
     required: false

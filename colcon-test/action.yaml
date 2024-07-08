@@ -44,7 +44,7 @@ runs:
   using: composite
   steps:
     - name: Set repository name
-      if: ${{ false }}
+      if: ${{ fromJsonA(false) }}
       id: set-repository-name
       run: echo "name=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_OUTPUT
       shell: bash

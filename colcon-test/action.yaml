@@ -19,6 +19,7 @@ inputs:
   checkout:
     description: First decide whether to check or not
     required: false
+    type: boolean
     default: true
   workspace-dir:
     description: ROS2 Workspace directory
@@ -44,13 +45,13 @@ runs:
   using: composite
   steps:
     - name: Set repository name
-      if: ${{ inputs.checkout }}
+      if: ${{ fromJson(inputs.checkout) }}
       id: set-repository-name
       run: echo "name=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Checkout
-      if: ${{ inputs.checkout }}
+      if: ${{ fromJson(inputs.checkout) }}
       uses: actions/checkout@v4
       with:
         path: ${{ inputs.workspace-dir }}/src/${{ steps.set-repository-name.outputs.name }}

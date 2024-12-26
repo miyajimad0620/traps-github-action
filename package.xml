@@ -16,7 +16,7 @@ limitations under the License. -->
 
 <package format="3">
   <name>traps-github-action</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>TRAPSで使用するGitHub Actionsのパッケージ</description>
   <maintainer email="traps.robocup@gmail.com">TRAPS</maintainer>
   <license>Apache-2.0</license>

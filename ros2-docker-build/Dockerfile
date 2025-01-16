@@ -13,10 +13,10 @@
 # limitations under the License.
 
 # イメージ引数設定
-ARG BASE_IMAGE
+ARG ROS_DISTRO
 
 # プラットフォームとベースのイメージを設定
-FROM ${BASE_IMAGE}
+FROM ros:${ROS_DISTRO}
 
 # ワークスペスのディレクトリ名と必須aptパッケージの名前
 ARG WORKSPACE_DIR
@@ -29,29 +29,41 @@ WORKDIR /root/ros2_ws
 # ユーザー設定
 USER root
 
-# リポジトリとws_entry_point.shのコピー
-COPY ${WORKSPACE_DIR}/. .
+# ws_entry_point.shのコピー
 COPY ${ENTRYPOINT_FILE} /ros_ws_entrypoint.sh
-RUN chmod +x /ros_ws_entrypoint.sh
 
-# GitHub workfrowで実行時のリモート設定を削除
-RUN if [ -f ./src/*/.git/config ]; then sed -i '/\[http "https:\/\/github\.com\/"\]/,+1 d' ./src/*/.git/config; fi
+# bashrcの設定
+RUN echo "source $(pwd)/install/setup.bash" >> ~/.bashrc
 
-# パッケージのインストール
-RUN apt-get update && apt-get upgrade -y
-RUN if [ -f ./src/*/config/apt/requirements.txt ]; then for requirements_file in "./src/*/config/apt/requirements.txt"; do xargs -a ${requirements_file} apt-get install -y; done; fi
-RUN apt-get install -y ${REQUIRE_APTS} lsb-release wget software-properties-common gnupg
-RUN wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 18
-RUN rosdep update && rosdep install -iy --from-paths src
-RUN rm ./llvm.sh && apt-get remove -y lsb-release wget software-properties-common gnupg
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# apt upgrade
+RUN <<EOF
+  apt-get update
+  apt-get upgrade -y --no-install-recommends
+  apt-get install -y --no-install-recommends ${REQUIRE_APTS}
+  apt-get autoremove -y --purge
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+EOF
 
-# ビルド
-RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -D CMAKE_C_COMPILER=clang-18 -D CMAKE_CXX_COMPILER=clang++-18
-RUN rm -rf ./log
+# ワークスペースのコピー
+COPY ${WORKSPACE_DIR}/. .
 
-# .bashrcへの書き込み
-RUN echo source $(pwd)/install/setup.bash >> ~/.bashrc
+# ビルドとgitの設定の実行
+RUN <<EOF
+  # GitHub workfrowで実行時のリモート設定を削除
+  if [ -f ./src/*/.git/config ]; then sed -i '/\[http "https:\/\/github\.com\/"\]/,+1 d' ./src/*/.git/config; fi
+
+  # パッケージのインストール
+  rosdep update
+  rosdep install -iy --from-paths src
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+
+  # ビルド
+  . /opt/ros/${ROS_DISTRO}/setup.sh
+  colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+  rm -rf ./log ./build ./src
+EOF
 
 # 実行前に行われる操作
 ENTRYPOINT ["/ros_ws_entrypoint.sh"]

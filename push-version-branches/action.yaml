@@ -20,6 +20,10 @@ inputs:
     description: First decide whether to check or not
     required: false
     default: true
+  token:
+    description: GitHub Token
+    required: false
+    default: ${{ github.token }}
   tag:
     description: Tag
     required: false
@@ -34,6 +38,7 @@ runs:
       with:
         fetch-tags: true
         fetch-depth: 0
+        token: ${{ inputs.token }}
 
     - name: Get versions
       id: get-versions

@@ -10,16 +10,13 @@ jobs:
   push-tag:
     runs-on: ubuntu-22.04
 
-    permissions:
-      contents: write
-      actions: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
+          token: ${{ secrets.PAT }}
 
       - name: Push version branches
         uses: ./push-version-branches

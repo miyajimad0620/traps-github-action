@@ -47,6 +47,10 @@ runs:
         echo minor=$(echo ${{ inputs.tag }} | cut -d. -f1-2) >> "$GITHUB_OUTPUT"
       shell: bash
 
+    - name: Set git config
+      run: git config --local url."https://${{ inputs.token }}@github.com".insteadOf https://github.com
+      shell: bash
+
     - name: Push major branch
       run: |
         git checkout -B ${{ steps.get-versions.outputs.major }}

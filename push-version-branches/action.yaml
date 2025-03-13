@@ -23,7 +23,7 @@ inputs:
   tag:
     description: Tag
     required: false
-    default: ${{ github.ref }}
+    default: ${GITHUB_REF#refs/*/}
 
 runs:
   using: composite

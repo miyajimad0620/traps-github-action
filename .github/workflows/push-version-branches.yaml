@@ -1,0 +1,25 @@
+name: Push version branches
+
+run-name: Push version branches:${{ github.ref_name }}(${{ github.event.head_commit.message }})
+
+on:
+  push:
+    tags: 'v*.*.*'
+
+jobs:
+  push-tag:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          token: ${{ secrets.PAT }}
+
+      - name: Push version branches
+        uses: ./push-version-branches
+        with:
+          checkout: false
+          token: ${{ secrets.PAT }}

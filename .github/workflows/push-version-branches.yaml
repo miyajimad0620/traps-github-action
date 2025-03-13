@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Push version branches
-        uses: TRAPS-RoboCup/traps-github-action/push-version-branches@main
+        uses: ./push-version-branches
         # with:
         #  tag: $${{ github.ref }}
         #  checkout: true

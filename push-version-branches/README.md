@@ -17,6 +17,7 @@ jobs:
 
     permissions:
       contents: write
+      workflows: write
 
     steps:
       - name: Push version branches

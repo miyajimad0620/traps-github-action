@@ -52,13 +52,9 @@ runs:
       shell: bash
 
     - name: Push major branch
-      run: |
-        git checkout -B ${{ steps.get-versions.outputs.major }}
-        git push origin ${{ steps.get-versions.outputs.major }}
+      run: git push origin HEAD:${{ steps.get-versions.outputs.major }}
       shell: bash
 
     - name: Push minor branch
-      run: |
-        git checkout -B ${{ steps.get-versions.outputs.minor }}
-        git push origin ${{ steps.get-versions.outputs.minor }}
+      run: git push origin HEAD:${{ steps.get-versions.outputs.minor }}
       shell: bash

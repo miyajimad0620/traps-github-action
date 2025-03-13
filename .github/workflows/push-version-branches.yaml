@@ -14,8 +14,13 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
       - name: Push version branches
         uses: ./push-version-branches
-        # with:
-        #  tag: $${{ github.ref }}
-        #  checkout: true
+        with:
+          checkout: false

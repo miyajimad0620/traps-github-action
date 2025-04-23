@@ -93,10 +93,10 @@ RUN <<EOF
 
   # ビルド
   . /opt/ros/${ROS_DISTRO}/setup.sh
-  colcon build ${BUILD_OPTIONS}
+  # colcon build ${BUILD_OPTIONS}
 
-  # ビルド後のスクリプト
-  ${POST_BUILD_SCRIPT}
+  # # ビルド後のスクリプト
+  # ${POST_BUILD_SCRIPT}
 EOF
 
 # 実行前に行われる操作

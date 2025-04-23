@@ -62,8 +62,8 @@ RUN <<EOF
 
   # ビルド
   . /opt/ros/${ROS_DISTRO}/setup.sh
-  # colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
-  # rm -rf ./log ./build ./src
+  colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+  rm -rf ./log ./build ./src
 EOF
 
 # 実行前に行われる操作

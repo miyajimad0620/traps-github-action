@@ -43,7 +43,7 @@ USER root
 COPY ${ENTRYPOINT_FILE} /ros_ws_entrypoint.sh
 
 # bashrcの設定
-RUN echo "source ${INSTALL_DIR}/setup.bash" >> ~/.bashrc
+# RUN echo "source ${INSTALL_DIR}/setup.bash" >> ~/.bashrc
 
 # apt upgrade
 RUN <<EOF
@@ -93,10 +93,7 @@ RUN <<EOF
 
   # ビルド
   . /opt/ros/${ROS_DISTRO}/setup.sh
-  # colcon build ${BUILD_OPTIONS}
-
-  # # ビルド後のスクリプト
-  # ${POST_BUILD_SCRIPT}
+  # colcon build ${BUILD_OPTIONS}doc
 EOF
 
 # 実行前に行われる操作

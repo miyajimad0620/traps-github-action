@@ -57,9 +57,7 @@ RUN <<EOF
   echo $TARGETPLATFORM
   echo $BUILDPLATFPRM
   uname -m
-
-  exit -1
-
+  
   apt-get update
   apt-get upgrade -y --no-install-recommends
   apt-get autoremove -y --purge

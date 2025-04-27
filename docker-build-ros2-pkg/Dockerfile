@@ -16,7 +16,7 @@
 ARG ROS_DISTRO
 
 # プラットフォームとベースのイメージを設定
-FROM ros:${ROS_DISTRO}
+FROM --platform=$BUILDPLATFORM ros:${ROS_DISTRO}
 
 # ワークスペスのディレクトリ名と必須aptパッケージの名前
 ARG WORKSPACE_DIR="/root/ros2_ws"

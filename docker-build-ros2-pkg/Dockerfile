@@ -59,6 +59,7 @@ RUN <<EOF
   uname -m
   
   apt-get update
+  sudo apt reinstall ros-humble-rclcpp --purge --auto-remove -y
   apt-get upgrade -y --no-install-recommends
   apt-get autoremove -y --purge
   apt-get clean

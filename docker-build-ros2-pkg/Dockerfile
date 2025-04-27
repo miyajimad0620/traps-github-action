@@ -93,7 +93,7 @@ RUN <<EOF
 
   # ビルド
   . /opt/ros/${ROS_DISTRO}/setup.sh
-  colcon build ${BUILD_OPTIONS}
+  MAKEFLAGS=-j1 colcon build ${BUILD_OPTIONS}
 
   # # ビルド後のスクリプト
   ${POST_BUILD_SCRIPT}

@@ -55,7 +55,7 @@ RUN <<EOF
   set -e
 
   echo $TARGETPLATFORM
-  echo $BUILDPLATFPRM
+  echo $BUILDPLATFORM
   uname -m
   
   apt-get update

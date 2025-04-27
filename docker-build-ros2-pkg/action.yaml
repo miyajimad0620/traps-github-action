@@ -72,7 +72,7 @@ runs:
         GIT_REMOTE_URL=https://github.com/${{ github.repository }}.git
         GIT_SHA=${{ github.sha }}
         PRE_IMPORT_SCRIPT=git config --global url.https://${{ inputs.token }}@github.com.insteadOf https://github.com
-        BUILD_OPTIONS=--cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to traps_ai_bridge_ros
+        BUILD_OPTIONS=--cmake-args -DCMAKE_BUILD_TYPE=Release --parallel-workers 1
       platforms: ${{ inputs.platforms }}
       builder: ${{ steps.set-docker-builder.outputs.name }}
       cache-from: type=gha

@@ -48,14 +48,14 @@ runs:
   
   - name: Set up QEMU
     uses: docker/setup-qemu-action@v3.6.0
-    with:
-      platforms: ${{ inputs.platforms }}
+    # with:
+    #   platforms: ${{ inputs.platforms }}
 
   - name: Set up Docker Buildx
     id: set-docker-builder
     uses: docker/setup-buildx-action@v3.10.0
-    with:
-      platforms: ${{ inputs.platforms }}
+    # with:
+    #   platforms: ${{ inputs.platforms }}
 
   - name: Build and push
     uses: docker/build-push-action@v6.15.0

@@ -14,9 +14,10 @@
 
 # イメージ引数設定
 ARG ROS_DISTRO
+ARG TARGETPLATFORM
 
 # プラットフォームとベースのイメージを設定
-FROM --platform=$BUILDPLATFORM ros:${ROS_DISTRO}
+FROM --platform=$TARGETPLATFORM ros:${ROS_DISTRO}
 
 # ワークスペスのディレクトリ名と必須aptパッケージの名前
 ARG WORKSPACE_DIR="/root/ros2_ws"

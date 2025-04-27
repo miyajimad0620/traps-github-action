@@ -19,6 +19,10 @@ ARG TARGETPLATFORM
 # プラットフォームとベースのイメージを設定
 FROM --platform=$TARGETPLATFORM ros:${ROS_DISTRO}
 
+
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 # ワークスペスのディレクトリ名と必須aptパッケージの名前
 ARG WORKSPACE_DIR="/root/ros2_ws"
 ARG INSTALL_DIR="${WORKSPACE_DIR}/install"
@@ -49,6 +53,12 @@ RUN echo "source ${INSTALL_DIR}/setup.bash" >> ~/.bashrc
 # apt upgrade
 RUN <<EOF
   set -e
+
+  echo $TARGETPLATFORM
+  echo $BUILDPLATFPRM
+  uname -m
+
+  exit -1
 
   apt-get update
   apt-get upgrade -y --no-install-recommends

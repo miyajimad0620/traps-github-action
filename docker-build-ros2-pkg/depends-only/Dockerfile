@@ -13,43 +13,34 @@
 # limitations under the License.
 
 # イメージ引数設定
-ARG BASE_IMAGE
+ARG ROS_DISTRO=humble
 
 # プラットフォームとベースのイメージを設定
-FROM ${BASE_IMAGE}
+FROM ros:${ROS_DISTRO}
 
 # ワークスペスのディレクトリ名と必須aptパッケージの名前
-ARG ROS_DISTRO="humble"
 ARG PRE_IMPORT_SCRIPT=""
 ARG GIT_REMOTE_URL
 ARG GIT_SHA
 ARG POST_IMPORT_SCRIPT=""
 ARG GIT_CLONE_OPTIONS="--depth 1 --recurse-submodules"
 ARG REPOS_FILES="*.repos"
-ARG WORKSPACE_DIR="/root/ros2_ws"
-ARG INSTALL_DIR="${WORKSPACE_DIR}/install"
-ARG ENTRYPOINT_FILE="ros_ws_entrypoint.sh"
-ARG PRE_BUILD_SCRIPT=""
-ARG BUILD_OPTIONS="--cmake-args -DCMAKE_BUILD_TYPE=Release --install-base ${INSTALL_DIR}"
-ARG POST_BUILD_SCRIPT="rm -rf ./log ./build ./src"
-
-# 設定されたワークスペースに移動
-WORKDIR ${WORKSPACE_DIR}
 
 # ユーザー設定
 USER root
-
-# bashrcの設定
-RUN echo "source ${INSTALL_DIR}/setup.bash" >> ~/.bashrc
-
-# ws_entry_point.shのコピー
-COPY ${ENTRYPOINT_FILE} /ros_ws_entrypoint.sh
 
 # ビルドとgitの設定の実行
 RUN <<EOF
   set -e
 
-  # git clone 
+  # make & cd workdir
+  WORKSPACE_DIR=$(mktemp -d)
+  cd ${WORKSPACE_DIR}
+
+  # pre import script
+  ${PRE_IMPORT_SCRIPT}
+
+  # git clone
   mkdir -p src/$(basename -s .git ${GIT_REMOTE_URL})
   cd src/$(basename -s .git ${GIT_REMOTE_URL})
   git init
@@ -67,19 +58,20 @@ RUN <<EOF
   # post import script
   ${POST_IMPORT_SCRIPT}
 
-  # ビルド前のスクリプト
-  ${PRE_BUILD_SCRIPT}
+  # パッケージのインストール
+  apt-get update
+  rosdep update --rosdistro=${ROS_DISTRO}
+  rosdep install -iy --from-paths src --rosdistro=${ROS_DISTRO}
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
 
-  # ビルド
-  . /opt/ros/${ROS_DISTRO}/setup.sh
-  colcon build ${BUILD_OPTIONS}
-
-  # ビルド後のスクリプト
-  ${POST_BUILD_SCRIPT}
+  # rm workdir
+  cd /
+  rm -rf ${WORKSPACE_DIR}
 EOF
 
 # 実行前に行われる操作
-ENTRYPOINT ["/ros_ws_entrypoint.sh"]
+ENTRYPOINT ["/ros_entrypoint.sh"]
 
 # 実行時のデフォルトのコマンド
 CMD ["bash"]

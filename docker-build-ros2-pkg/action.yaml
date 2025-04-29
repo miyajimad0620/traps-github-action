@@ -40,12 +40,6 @@ runs:
       password: ${{ github.token }}
       logout: false
 
-  - name: Extract metadata (tags, labels) for Docker
-    id: set-docker-metadata
-    uses: docker/metadata-action@v5
-    with:
-      images: ghcr.io/${{ github.repository }}
-  
   - name: Set up QEMU
     uses: docker/setup-qemu-action@v3
     with:
@@ -57,6 +51,77 @@ runs:
     with:
       platforms: ${{ inputs.platforms }}
 
+  - name: Make temp dir
+    id: make-temp-dir
+    run: echo "path=$(mktemp -d ${{ github.workspace }}/tmp.XXXXXX)" >> $GITHUB_OUTPUT
+    shell: bash
+  
+  - name: Checkout
+    uses: actions/checkout@v4
+    with:
+      token: ${{ inputs.token }}
+      path: ${{ steps.make-temp-dir.outputs.path }}
+      fetch-depth: 0
+
+  - name: Get depend chenged sha
+    working-directory: ${{ steps.make-temp-dir.outputs.path }}
+    id: get-depend-changed
+    run: echo "sha=$(git log -n 1 --pretty=format:"%H" -- $(git ls-files '*.repos' package.xml))" >> $GITHUB_OUTPUT
+    shell: bash
+
+  - name: Extract metadata (tags, labels) for Docker (depends only)
+    id: set-docker-metadata-depends-only
+    uses: docker/metadata-action@v5
+    with:
+      images: ghcr.io/${{ github.repository }}/depends_only
+
+  - name: Extract metadata (tags, labels) for Docker (depends only) (sha)
+    id: set-docker-metadata-depends-only-sha
+    uses: docker/metadata-action@v5
+    with:
+      images: ghcr.io/${{ github.repository }}/depends_only
+      tags: sha-${{ steps.get-depend-changed.outputs.sha }}
+
+  - name: Check depends-only image exist
+    id: check-depends-only-image
+    run: |
+      if docker manifest inspect ${{ steps.set-docker-metadata-depends-only-sha.outputs.tags }} > /dev/null 2>&1;
+      then
+        echo "exist=true" >> $GITHUB_OUTPUT
+      else
+        echo "exist=false" >> $GITHUB_OUTPUT
+      fi
+    shell: bash
+
+  - name: Build and push (depends only)
+    if: ${{ steps.check-depends-only-image.outputs.exist != 'true' }}
+    uses: docker/build-push-action@v5
+    with:
+      context: ${{ github.action_path }}/depends-only
+      file: ${{ github.action_path }}/depends-only/Dockerfile
+      push: true
+      tags: |
+        ${{ steps.set-docker-metadata-depends-only.outputs.tags }}
+        ${{ steps.set-docker-metadata-depends-only-sha.outputs.tags }}
+      labels: |
+        ${{ steps.set-docker-metadata-depends-only.outputs.labels }}
+        ${{ steps.set-docker-metadata-depends-only-sha.outputs.labels }}
+      build-args: |
+        ROS_DISTRO=${{ inputs.rosdistro }}
+        GIT_REMOTE_URL=https://github.com/${{ github.repository }}.git
+        GIT_SHA=${{ steps.get-depend-changed.outputs.sha }}
+        PRE_IMPORT_SCRIPT=git config --global url.https://${{ inputs.token }}@github.com.insteadOf https://github.com
+      platforms: ${{ inputs.platforms }}
+      builder: ${{ steps.set-docker-builder.outputs.name }}
+      cache-from: type=gha
+      cache-to: type=gha, mode=max
+
+  - name: Extract metadata (tags, labels) for Docker
+    id: set-docker-metadata
+    uses: docker/metadata-action@v5
+    with:
+      images: ghcr.io/${{ github.repository }}
+
   - name: Build and push
     uses: docker/build-push-action@v5
     with:
@@ -66,13 +131,11 @@ runs:
       tags: ${{ steps.set-docker-metadata.outputs.tags }}
       labels: ${{ steps.set-docker-metadata.outputs.labels }}
       build-args: |
-        ROS_DISTRO=${{ inputs.rosdistro }}
+        BASE_IMAGE=${{ steps.set-docker-metadata-depends-only-sha.outputs.tags }}
         ENTRYPOINT_FILE=ros_ws_entrypoint.sh
-        GIT_REPOSITORY_NAME=${{ github.event.repository.name }}
         GIT_REMOTE_URL=https://github.com/${{ github.repository }}.git
-        GIT_SHA=${{ github.sha }}
+        GIT_SHA=${{ steps.get-depend-changed.outputs.sha }}
         PRE_IMPORT_SCRIPT=git config --global url.https://${{ inputs.token }}@github.com.insteadOf https://github.com
-        BUILD_OPTIONS=--cmake-args -DCMAKE_BUILD_TYPE=Release
       platforms: ${{ inputs.platforms }}
       builder: ${{ steps.set-docker-builder.outputs.name }}
       cache-from: type=gha

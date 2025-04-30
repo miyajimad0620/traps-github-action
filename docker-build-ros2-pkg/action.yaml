@@ -134,7 +134,7 @@ runs:
         BASE_IMAGE=${{ steps.set-docker-metadata-depends-only-sha.outputs.tags }}
         ENTRYPOINT_FILE=ros_ws_entrypoint.sh
         GIT_REMOTE_URL=https://github.com/${{ github.repository }}.git
-        GIT_SHA=${{ steps.get-depend-changed.outputs.sha }}
+        GIT_SHA=${{ github.sha }}
         PRE_IMPORT_SCRIPT=git config --global url.https://${{ inputs.token }}@github.com.insteadOf https://github.com
       platforms: ${{ inputs.platforms }}
       builder: ${{ steps.set-docker-builder.outputs.name }}

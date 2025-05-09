@@ -33,8 +33,9 @@ runs:
   using: composite
   steps:
   - name: Build depends-only image
+    working-directory: ${{ github.action_path }}
     id: build-depends-only-image
-    uses: ${{ github.action_path }}/depends-only
+    uses: ./depends-only
     with:
       token: ${{ inputs.token }}
       platforms: ${{ inputs.platforms }}

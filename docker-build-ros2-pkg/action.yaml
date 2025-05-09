@@ -34,6 +34,7 @@ runs:
   steps:
   - name: Build depends-only image
     id: build-depends-only-image
+    uses: ${{ github.action_path }}/depends-only
     with:
       token: ${{ inputs.token }}
       platforms: ${{ inputs.platforms }}

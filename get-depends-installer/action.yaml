@@ -29,4 +29,4 @@ outputs:
 runs:
   using: docker
   image: docker://ros:{{ inputs.rosdistro }}
-  entrypoint: ${{ github.action_path }}/entrypoint.sh
+  entrypoint: entrypoint.sh

@@ -1,0 +1,59 @@
+name: "Updated: Docker Build Package"
+
+run-name: "Updated: Docker Build Package:${{ github.ref_name }}(${{ github.event.head_commit.message }})"
+
+on:
+  push:
+    paths:
+      - ".traps-github-action/docker-build-pkg/**"
+      - ".github/workflows/updated-docker-build-pkg.yaml"
+  pull_request:
+    paths:
+      - ".traps-github-action/docker-build-pkg/**"
+      - ".github/workflows/updated-docker-build-pkg.yaml"
+
+jobs:
+  test-docker-build-pkg-action:
+    runs-on: ubuntu-22.04
+
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: .traps-github-action
+      
+      - name: Docker Build Packages
+        uses: ./.traps-github-action/docker-build-pkg
+        with:
+          builder-base-image: ros:humble-ros-base
+          executor-base-image: ros:humble-ros-base
+          build-depends-install-script: >-
+            apt-get update &&
+            rosdep update &&
+            rosdep install
+            --from-paths src
+            -iy
+            -t build
+            -t buildtool_export
+            -t buildtool_export
+            -t buildtool_export &&
+            apt-get clean && rm -rf /var/lib/apt/lists/*
+          pre-build-script: . /opt/ros/humble/setup.sh
+          post-build-script: rm -rf log
+          exec-depends-install-script: >-
+            apt-get update && 
+            apt-get install -y --no-install-recommends python3-rosdep2 &&
+            sudo rm -rf /etc/ros/rosdep/sources.list.d/* &&
+            rosdep init && rosdep update --rosdistro=$ROS_DISTRO &&
+            rosdep install
+            --from-paths install/share
+            --rosdistro=$ROS_DISTRO
+            -iy
+            -t exec &&
+            SUDO_FORCE_REMOVE=yes apt-get autoremove -y --purge python3-rosdep2 &&
+            apt-get clean && rm -rf /var/lib/apt/lists/*
+          

@@ -5,11 +5,11 @@ run-name: "Updated: Get depends installer:${{ github.ref_name }}(${{ github.even
 on:
   push:
     paths:
-      - ".traps-github-action/get-depends-installer/**"
+      - "get-depends-installer/**"
       - ".github/workflows/updated-get-depends-installer.yaml"
   pull_request:
     paths:
-      - ".traps-github-action/get-depends-installer/**"
+      - "get-depends-installer/**"
       - ".github/workflows/updated-get-depends-installer.yaml"
 
 jobs:

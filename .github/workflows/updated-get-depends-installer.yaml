@@ -1,0 +1,43 @@
+name: "Updated: Docker Build Package"
+
+run-name: "Updated: Docker Build Package:${{ github.ref_name }}(${{ github.event.head_commit.message }})"
+
+on:
+  push:
+    paths:
+      - ".traps-github-action/docker-build-pkg/**"
+      - ".github/workflows/updated-docker-build-pkg.yaml"
+  pull_request:
+    paths:
+      - ".traps-github-action/docker-build-pkg/**"
+      - ".github/workflows/updated-docker-build-pkg.yaml"
+
+jobs:
+  test-docker-build-pkg-action:
+    runs-on: ubuntu-22.04
+
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: .traps-github-action
+      
+      - name: Get depends install scripts
+        id: get-depends-installer
+        uses: ./.traps-github-action/get-depends-installer
+      
+      - name: Docker Build Packages
+        uses: ./.traps-github-action/docker-build-pkg
+        with:
+          builder-base-image: ros:humble-ros-base
+          executor-base-image: ros:humble-ros-core
+          build-depends-install-script: ${{ steps.get-depends-installer.outputs.build-install-script }}
+          pre-build-script: . /opt/ros/humble/setup.sh
+          post-build-script: rm -rf log
+          exec-depends-install-script: ${{ steps.get-depends-installer.outputs.exec-install-script }}
+          push: false
+          

@@ -28,5 +28,5 @@ outputs:
 
 runs:
   using: docker
-  image: docker://ros:{{ inputs.rosdistro }}
+  image: docker://ros
   entrypoint: entrypoint.sh

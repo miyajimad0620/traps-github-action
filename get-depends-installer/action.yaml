@@ -29,7 +29,7 @@ outputs:
 runs:
   using: docker
   image: docker://ros
-  entrypoint: |
+  entrypoint: >-
     set -e
 
     get_rodep_apt() {

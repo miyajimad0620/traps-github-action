@@ -55,7 +55,7 @@ inputs:
   build-options:
     description: Options for build
     required: false
-    default: "--merge-install --executor sequential --cmake-args -DCMAKE-BUILD-TYPE=Release"
+    default: "--merge-install --executor sequential --cmake-args -DCMAKE_BUILD_TYPE=Release"
   post-build-script:
     description: Script to run after build
     required: false
@@ -68,6 +68,10 @@ inputs:
     #   apt-get update &&
     #   apt-get install -y --no-install-recommends ...  &&
     #   apt-get clean && rm -rf /var/lib/apt/lists/*
+  push:
+    description: Push Docker Image to ghcr.io
+    required: false
+    default: ${{ github.event_name != 'pull_request' }}
   
 
 runs:
@@ -133,7 +137,7 @@ runs:
       target: builder
       context: .
       file: ${{ github.action_path }}/Dockerfile
-      push: true
+      push: ${{ inputs.push }}
       tags: ${{ steps.set-docker-metadata-builder.outputs.tags }}
       labels: ${{ steps.set-docker-metadata-builder.outputs.labels }}
       build-args: |
@@ -163,7 +167,7 @@ runs:
       target: executor
       context: .
       file: ${{ github.action_path }}/Dockerfile
-      push: true
+      push: ${{ inputs.push }}
       tags: ${{ steps.set-docker-metadata-executor.outputs.tags }}
       labels: ${{ steps.set-docker-metadata-executor.outputs.labels }}
       build-args: |

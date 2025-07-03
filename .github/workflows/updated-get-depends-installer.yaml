@@ -1,19 +1,19 @@
-name: "Updated: Docker Build Package"
+name: "Updated: Get depends installer"
 
-run-name: "Updated: Docker Build Package:${{ github.ref_name }}(${{ github.event.head_commit.message }})"
+run-name: "Updated: Get depends installer:${{ github.ref_name }}(${{ github.event.head_commit.message }})"
 
 on:
   push:
     paths:
-      - ".traps-github-action/docker-build-pkg/**"
-      - ".github/workflows/updated-docker-build-pkg.yaml"
+      - ".traps-github-action/get-depends-installer/**"
+      - ".github/workflows/updated-get-depends-installer.yaml"
   pull_request:
     paths:
-      - ".traps-github-action/docker-build-pkg/**"
-      - ".github/workflows/updated-docker-build-pkg.yaml"
+      - ".traps-github-action/get-depends-installer/**"
+      - ".github/workflows/updated-get-depends-installer.yaml"
 
 jobs:
-  test-docker-build-pkg-action:
+  test-get-depends-installer-action:
     runs-on: ubuntu-22.04
 
     permissions:
